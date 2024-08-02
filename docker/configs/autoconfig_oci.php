@@ -1,9 +1,10 @@
 <?php
 
 $AUTOCONFIG = [
-  'dbname' => 'xe',
-  'dbhost' => 'oci',
-  'dbuser' => 'system',
-  'dbpass' => 'oracle',
-  'dbtype' => 'oci'
+  //'dbname' => 'XEPDB1', # 18, 21
+  'dbname' => 'XE', # 11
+  'dbhost' => 'database-oci',
+  'dbuser' => 'nextcloud',
+  'dbpass' => 'secret123',
+  'dbtype' => 'oci',
 ]; 

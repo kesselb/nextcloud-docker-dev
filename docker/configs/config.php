@@ -43,6 +43,7 @@
 	'skeletondirectory' => '/skeleton',
 
 	'setup_create_db_user' => false,
+	'dbtableprefix' => 'oc_',
 
 	//PLACEHOLDER
 ];

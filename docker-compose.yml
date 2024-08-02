@@ -544,6 +544,17 @@ services:
     depends_on:
       - proxy
 
+  database-oci:
+    image: gvenzl/oracle-xe:11 # 11, 18, 21
+    environment:
+      ORACLE_PASSWORD: oracle
+      APP_USER: nextcloud
+      APP_USER_PASSWORD: secret123
+    ports:
+      - "${PORTBASE:-800}3:1521"
+    volumes:
+      - oci:/opt/oracle/oradata
+
   redis:
     image: redis:7
 
@@ -839,6 +850,7 @@ volumes:
   config:
   mysql:
   postgres:
+  oci:
   data2:
   config2:
   document_data:

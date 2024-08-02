@@ -52,6 +52,12 @@ wait_for_other_containers() {
 		[ $? -ne 0 ] && echo "⚠ Unable to connect to the PostgreSQL server"
 		sleep 2
 	fi
+	if [ "$SQL" = "oci" ]
+	then
+		while ! timeout 1 bash -c "(echo > /dev/tcp/database-oci/1521) 2>/dev/null"; do sleep 2; done
+		[ $? -ne 0 ] && echo "⚠ Unable to connect to the Oracle XE server"
+		sleep 30
+	fi
 	[ $? -eq 0 ] && output "✅ Database server ready"
 }
 
@@ -180,6 +186,9 @@ install() {
 	DBNAME=$(echo "$VIRTUAL_HOST" | cut -d '.' -f1)
 	echo "database name will be $DBNAME"
 
+	# We copy the default config to the container
+	cp /root/config.php "$WEBROOT"/config/config.php
+
 	if [ "$SQL" = "mysql" ]
 	then
 		cp /root/autoconfig_mysql.php "$WEBROOT"/config/autoconfig.php
@@ -197,10 +206,10 @@ install() {
 	if [ "$SQL" = "oci" ]
 	then
 		cp /root/autoconfig_oci.php "$WEBROOT"/config/autoconfig.php
+		sed -i "s/dbtableprefix' => 'oc/dbtableprefix' => '$DBNAME/" "$WEBROOT/config/config.php"
+		SQLHOST=database-oci
 	fi
 
-	# We copy the default config to the container
-	cp /root/config.php "$WEBROOT"/config/config.php
 	chown -R www-data:www-data "$WEBROOT"/config/config.php
 
 	mkdir -p "$WEBROOT/apps-extra"
@@ -213,7 +222,11 @@ install() {
 
 	output "🔧 Starting auto installation"
 	if [ "$SQL" = "oci" ]; then
-		OCC maintenance:install --admin-user=$USER --admin-pass=$PASSWORD --database="$SQL" --database-name=xe --database-host="$SQLHOST" --database-user=system --database-pass=oracle
+		sleep 30
+		# OCI 11
+		OCC maintenance:install --admin-user=$USER --admin-pass=$PASSWORD --database="$SQL" --database-name=XE --database-host="$SQLHOST" --database-user=nextcloud --database-pass=secret123
+		# OCI 18, 21
+		#OCC maintenance:install --admin-user=$USER --admin-pass=$PASSWORD --database="$SQL" --database-name=XEPDB1 --database-host="$SQLHOST" --database-user=nextcloud --database-pass=secret123
 	elif [ "$SQL" = "pgsql" ]; then
 		OCC maintenance:install --admin-user=$USER --admin-pass=$PASSWORD --database="$SQL" --database-name="$DBNAME" --database-host="$SQLHOST" --database-user=postgres --database-pass=postgres
 	elif [ "$SQL" = "mysql" ]; then
