@@ -151,7 +151,7 @@ configure_ldap() {
 		return 0
 	fi
 
-	timeout 5 bash -c 'until echo > /dev/tcp/ldap/389; do sleep 0.5; done' 2>/dev/null
+	timeout 5 bash -c 'until echo > /dev/tcp/ldap/1389; do sleep 0.5; done' 2>/dev/null
 	if [ $? -eq 0 ]; then
 		output "LDAP server available"
 		export LDAP_USER_FILTER="(|(objectclass=inetOrgPerson))"
@@ -172,7 +172,7 @@ configure_ldap() {
 		OCC ldap:set-config s01 ldapLoginFilter "(&$LDAP_USER_FILTER(uid=%uid))"
 		OCC ldap:set-config s01 ldapLoginFilterMode '1'
 		OCC ldap:set-config s01 ldapLoginFilterUsername '1'
-		OCC ldap:set-config s01 ldapPort '389'
+		OCC ldap:set-config s01 ldapPort '1389'
 		OCC ldap:set-config s01 ldapTLS '0'
 		OCC ldap:set-config s01 ldapUserDisplayName 'cn'
 		OCC ldap:set-config s01 ldapUserFilter "$LDAP_USER_FILTER"

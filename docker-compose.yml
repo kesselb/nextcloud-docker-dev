@@ -664,18 +664,18 @@ services:
       - redis:/data
 
   ldap:
-    image: osixia/openldap
-    command: --copy-service --loglevel debug
-    expose:
-      - 389
-      - 636
+    image: bitnami/openldap:2.6
     ports:
-      - 3389:389
+      - '1389:1389'
+      - '1636:1636'
     environment:
-      LDAP_DOMAIN: planetexpress.com
-      LDAP_BASE_DN: dc=planetexpress,dc=com
+      LDAP_ROOT: dc=planetexpress,dc=com
+      LDAP_ADMIN_USERNAME: admin
+      LDAP_ADMIN_PASSWORD: admin
+      LDAP_SKIP_DEFAULT_TREE: yes
+      LDAP_CUSTOM_LDIF_DIR: /ldifs
     volumes:
-      - ./data/ldap:/container/service/slapd/assets/config/bootstrap/ldif/custom
+      - ./data/ldifs:/ldifs
 
   phpmyadmin:
     image: phpmyadmin
